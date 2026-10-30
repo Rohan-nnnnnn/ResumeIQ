@@ -1,87 +1,75 @@
-RESUMEIQ – SYSTEM ARCHITECTURE
+ResumeIQ — System Architecture
 
 Overview
 
-ResumeIQ is an AI-powered resume analysis and improvement workflow built using n8n, LLM integrations, and Google Drive.
+ResumeIQ uses a multi-stage AI workflow to analyze resumes, generate improvement suggestions and verify the generated recommendations before producing the final output.
 
-The architecture separates document retrieval, content extraction, resume analysis, correction generation, verification, and final result merging into dedicated processing stages.
+The architecture separates resume extraction, analysis, generation and verification to improve processing clarity and reduce unsupported AI-generated information.
 
 System Components
 
-1. Google Drive – Resume Input
+1. Resume Input
 
-Provides the storage location for uploaded resumes that need to be processed.
+Google Drive acts as the configured resume input source. The workflow receives the submitted resume for processing.
 
-2. n8n – Workflow Orchestration
+2. Resume Text Extraction
 
-Coordinates document retrieval, extraction, AI processing, verification, and output generation.
+The extraction stage converts the resume into text that can be processed by the AI analysis stage.
 
-3. Document Extraction – Content Processing
+3. AI Resume Analysis
 
-Processes the uploaded resume through the configured document extraction or conversion path and makes its content available to the AI stages.
+The analysis stage evaluates the extracted content, including:
 
-4. Resume Analysis – AI Evaluation
+- Skills and technical competencies.
+- Education.
+- Projects and experience.
+- Resume structure.
+- Content clarity.
 
-Analyzes the extracted resume content and identifies relevant strengths, weaknesses, and improvement areas.
+4. Improvement Generation
 
-5. Correction Chain – Content Improvement
+The improvement stage uses the analysis results to generate recommendations for improving resume content and presentation.
 
-Generates suggested improvements to resume wording, structure, and presentation based on the analysis.
+5. Verification Stage
 
-6. Verification Chain – Output Validation
+A separate AI verification stage reviews the generated recommendations.
 
-Reviews the generated corrections and checks their consistency with the available candidate information.
+Its purpose is to identify:
 
-7. Merge Stage – Result Combination
+- Unsupported qualifications.
+- Fabricated experience.
+- Invented skills or achievements.
+- Changes that distort the original meaning.
+- Recommendations that are irrelevant to the resume.
 
-Combines the relevant outputs from the AI processing stages into the final result.
+6. Final Output
+
+The final stage combines the analysis and verified recommendations into a structured result.
 
 Processing Flow
 
-1. The user uploads a resume to Google Drive.
-2. n8n retrieves the uploaded document.
-3. The document extraction process makes the resume content available.
-4. The extracted content is passed to the resume analysis stage.
-5. The analysis stage evaluates the resume and identifies improvement areas.
-6. The correction stage generates suggested improvements.
-7. The verification stage reviews the generated corrections.
-8. The relevant results are combined through the merge stage.
-9. The final resume improvement output is returned.
+Resume Input → Text Extraction → AI Analysis → Improvement Generation → Verification → Final Output
 
-Data Flow
+Architecture Principles
 
-Google Drive Resume
-→ n8n Document Retrieval
-→ Content Extraction
-→ AI Resume Analysis
-→ Correction Generation
-→ AI Verification
-→ Result Merging
-→ Final Output
+Separation of Responsibilities
 
-AI Processing Architecture
+Each processing stage has a defined purpose, making the workflow easier to maintain and troubleshoot.
 
-ResumeIQ uses multiple LLM processing stages to divide the work into specialized tasks.
+Factual Consistency
 
-- Analysis: Understands and evaluates resume content.
-- Correction: Generates improvement suggestions.
-- Verification: Reviews the generated suggestions.
-- Merging: Combines the relevant outputs.
+Recommendations should improve presentation without introducing information that is not supported by the original resume.
 
-Technology Stack
+Multi-Stage AI Processing
 
-- Workflow Automation: n8n
-- AI Processing: LLM Integration
-- File Storage: Google Drive
-- Document Processing: Configured extraction and conversion nodes
-- Output Processing: n8n Merge and verification stages
+Analysis, improvement generation and verification are handled as separate processing stages.
 
-Architecture Objective
+Modularity
 
-The architecture demonstrates how multiple AI processing stages can work together in an automated resume improvement pipeline.
+Individual stages can be modified or extended without redesigning the entire workflow.
 
-Separating analysis, correction, and verification helps organize the workflow and makes the generated output easier to review.
+Limitations
 
-Accuracy Consideration
+The quality of analysis depends on text extraction accuracy, model capabilities and the information available in the original resume.
 
-The system should preserve the candidate's actual qualifications and experience. AI-generated improvements must not create unsupported skills, achievements, education, or employment history.
+The verification stage reduces the risk of unsupported suggestions but does not guarantee that every generated recommendation is factually correct.
