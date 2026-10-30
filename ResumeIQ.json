@@ -1,0 +1,1429 @@
+{
+  "name": "ResumeIQ",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "*",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1B6y5HyRFktUCt7Vqe3NgmB6JS4XMSm9D",
+            "mode": "list",
+            "cachedResultName": "Unprocessed-R",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1B6y5HyRFktUCt7Vqe3NgmB6JS4XMSm9D"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -288,
+        80
+      ],
+      "id": "d8abe57d-8e6f-40d5-becd-59d943fd91e3",
+      "name": "Search files and folders",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I17cLKvpb4zei6B5",
+          "name": "KnowledgeForge"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        80
+      ],
+      "id": "e617981a-3d32-485d-bebd-450f8f99d3bf",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        80
+      ],
+      "id": "994a76b6-f891-429a-8ede-34ed6c4b8dbf",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I17cLKvpb4zei6B5",
+          "name": "KnowledgeForge"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.name.split('.').pop().toLowerCase() }}",
+                    "rightValue": "pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2a48570d-d6f7-41d8-8384-a4c0453c351c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "PDF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c390ab87-9315-4270-9197-d55ad119cae9",
+                    "leftValue": "={{ $json.name.split('.').pop().toLowerCase() }}",
+                    "rightValue": "docx",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DOCX"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        64
+      ],
+      "id": "130476b2-ef4d-4d2d-84fc-516d7e25c211",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1P__FZZpJYpsOnat-RO6Qs_l8wE8lZAzH",
+          "mode": "list",
+          "cachedResultName": "Error-R",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1P__FZZpJYpsOnat-RO6Qs_l8wE8lZAzH"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        384,
+        272
+      ],
+      "id": "14b9d652-018b-4039-be5e-584f7aac1e4f",
+      "name": "Move file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I17cLKvpb4zei6B5",
+          "name": "KnowledgeForge"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        -112
+      ],
+      "id": "d2d331b8-0ceb-49f4-9cee-b519db0d2b62",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "curlImport": "",
+        "httpVariantWarning": "",
+        "method": "POST",
+        "url": "https://v2.convertapi.com/convert/docx/to/pdf?StoreFile=true&Auth=qASagPNfjSsFEzmhFtmpoTAkN4j9HPMN",
+        "": "",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "convertApi",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": false,
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "File",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {},
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        384,
+        80
+      ],
+      "id": "b3e20d38-8d94-4ef5-b5c3-2bc370b3102c",
+      "name": "ConvertAPI HTTP Request",
+      "extendsCredential": "convertApi",
+      "credentials": {
+        "convertApi": {
+          "id": "hCO4f5QOAE05RHVS",
+          "name": "ConvertAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        80
+      ],
+      "id": "500eff23-f3b3-4b03-99ea-0f2dbfbfa82d",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Files[0].Url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        608,
+        80
+      ],
+      "id": "aeb95972-b752-4588-b586-c002feea05b5",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1e6b33e8-28b7-4076-affe-38bc4db46ea1",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "e42c72e3-ba97-4af7-a5e7-a55cdeae15a2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1P__FZZpJYpsOnat-RO6Qs_l8wE8lZAzH",
+          "mode": "list",
+          "cachedResultName": "Error-R",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1P__FZZpJYpsOnat-RO6Qs_l8wE8lZAzH"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        80
+      ],
+      "id": "d723131b-7fdb-45ff-bf78-e4c893cf9682",
+      "name": "Move file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I17cLKvpb4zei6B5",
+          "name": "KnowledgeForge"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "416eb7de-6f5d-48db-be50-2d6d777bc9e8",
+              "name": "resume_text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "02c8cd36-386b-4a64-b9de-d4577b84cf3d",
+              "name": "file_name",
+              "value": "={{ $('Search files and folders').item.json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1280,
+        -112
+      ],
+      "id": "ba53f476-12cb-4557-8c3a-76ee68e21f15",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        112
+      ],
+      "id": "4a109c71-43e7-4355-b9f3-57504fe9a846",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "MNTPUWGtWrLwNzvT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"candidate_name\": {\n      \"type\": \"string\",\n      \"description\": \"Candidate name, or Not specified if missing\"\n    },\n    \"contact_information\": {\n      \"type\": \"string\",\n      \"description\": \"Contact details explicitly present in the resume, or Not specified\"\n    },\n    \"technical_skills\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"education\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"work_experience\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"projects\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"certifications\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"strengths\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"weaknesses\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"improvement_suggestions\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    }\n  },\n  \"required\": [\n    \"candidate_name\",\n    \"contact_information\",\n    \"technical_skills\",\n    \"education\",\n    \"work_experience\",\n    \"projects\",\n    \"certifications\",\n    \"strengths\",\n    \"weaknesses\",\n    \"improvement_suggestions\"\n  ],\n  \"additionalProperties\": false\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1872,
+        112
+      ],
+      "id": "1b54015e-2035-4fbc-b7c7-65247516278f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"strongest_aspects\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"weaknesses\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"bullet_point_improvements\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"skills_and_projects_suggestions\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"formatting_suggestions\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"missing_information\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    }\n  },\n  \"required\": [\n    \"strongest_aspects\",\n    \"weaknesses\",\n    \"bullet_point_improvements\",\n    \"skills_and_projects_suggestions\",\n    \"formatting_suggestions\",\n    \"missing_information\"\n  ],\n  \"additionalProperties\": false\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2224,
+        240
+      ],
+      "id": "d62534d7-4bc7-49da-ad20-24afc95d5fb7",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        240
+      ],
+      "id": "8204cb4e-62b6-4532-85d3-3ebeb2fbcf07",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "MNTPUWGtWrLwNzvT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e839a76d-4ca2-42f1-a907-8c113d47d7b5",
+              "name": "resume_text",
+              "value": "={{ $('Edit Fields').item.json.resume_text }}",
+              "type": "string"
+            },
+            {
+              "id": "9dc85ffc-136a-4468-90d5-23f80e486e80",
+              "name": "analysis_type",
+              "value": "resume_analysis",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1504,
+        -112
+      ],
+      "id": "c5abfc10-88cd-4ad7-991f-f8a76f48ae58",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2432,
+        -112
+      ],
+      "id": "e3d947a8-4bdb-4a29-9b41-1634846b2e3a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3.8-27b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        3024,
+        112
+      ],
+      "id": "0c9a7113-cb1c-47c8-a510-5c7cc32e5e89",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "MNTPUWGtWrLwNzvT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"verification_status\": {\n      \"type\": \"string\",\n      \"enum\": [\"PASS\", \"REVIEW\"]\n    },\n    \"unsupported_claims\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"missing_facts\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    },\n    \"corrections_required\": {\n      \"type\": \"array\",\n      \"items\": { \"type\": \"string\" }\n    }\n  },\n  \"required\": [\n    \"verification_status\",\n    \"unsupported_claims\",\n    \"missing_facts\",\n    \"corrections_required\"\n  ],\n  \"additionalProperties\": false\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3152,
+        112
+      ],
+      "id": "098a74f4-fda6-4017-966a-47675e5454e4",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2741515f-8f25-451a-9871-a71c730563cb",
+              "leftValue": "={{ $json.output.verification_status }}",
+              "rightValue": "REVIEW",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3360,
+        -112
+      ],
+      "id": "73ba9ff0-de65-49fd-998a-b3963bb5bfc1",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nYou are ResumeIQ's resume verification checker.\n\nCompare the rewritten resume against the original resume analysis provided below.\n\nORIGINAL RESUME ANALYSIS:\n{{ JSON.stringify($('Resume Analyzer').item.json.output) }}\n\nREWRITTEN RESUME:\n{{ $json.text }}\n\nCheck for:\n- Invented skills, education, employers, projects, certifications, or dates.\n- Invented numerical metrics or achievements.\n- Claims that were only suggestions in the original analysis.\n- Missing or altered factual details.\n\nReturn valid JSON with these fields:\n{\n  \"verification_status\": \"PASS or REVIEW\",\n  \"unsupported_claims\": [],\n  \"missing_facts\": [],\n  \"corrections_required\": []\n}\n\nUse PASS only if every factual claim in the rewritten resume is supported by the original analysis. Otherwise, use REVIEW and list the problems. Never assume an unverified claim is true.\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3008,
+        -112
+      ],
+      "id": "ea3aa3ad-9289-4ca7-9a51-0d4d5a683750",
+      "name": "Verifier"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        3664,
+        -144
+      ],
+      "id": "0181f014-9781-4189-a809-f4a181728b31",
+      "name": "Groq Chat Model4",
+      "credentials": {
+        "groqApi": {
+          "id": "MNTPUWGtWrLwNzvT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are ResumeIQ, an AI resume analysis assistant.\n\nAnalyze the resume provided below.\n\nExtract the following information:\n1. Candidate name, if available\n2. Contact information, if available\n3. Technical skills\n4. Education\n5. Work experience\n6. Projects\n7. Certifications\n8. Key strengths\n9. Weaknesses or missing information\n10. Suggestions for improving the resume\n\nRules:\n- Use only information explicitly present in the resume.\n- Never invent qualifications, skills, dates, or experience.\n- If information is missing, return \"Not specified\".\n- Give practical, specific improvement suggestions.\n- Do not claim to calculate an actual employer ATS score.\n\nReturn valid JSON using exactly these keys:\n{\n  \"candidate_name\": \"\",\n  \"contact_information\": \"\",\n  \"technical_skills\": [],\n  \"education\": [],\n  \"work_experience\": [],\n  \"projects\": [],\n  \"certifications\": [],\n  \"strengths\": [],\n  \"weaknesses\": [],\n  \"improvement_suggestions\": []\n}\n\nRESUME TEXT:\n{{ $json.resume_text }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1728,
+        -112
+      ],
+      "id": "2ecd905b-776e-4f53-b620-59ff41ba29fb",
+      "name": "Resume Analyzer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nYou are ResumeIQ, an expert resume improvement assistant.\n\nReview the resume analysis provided below and generate a personalized improvement report.\n\nYour tasks:\n1. Identify the strongest aspects of the resume.\n2. Identify missing, weak, or unclear information.\n3. Recommend improvements to bullet points and descriptions.\n4. Suggest ways to demonstrate skills through projects or measurable achievements.\n5. Recommend improvements to formatting, organization, and readability.\n6. Identify missing information the candidate should add, if applicable.\n\nRules:\n- Base recommendations only on the supplied analysis.\n- Never invent qualifications, experience, projects, metrics, or achievements.\n- Clearly distinguish confirmed facts from suggestions.\n- Do not assume a particular job role or industry.\n- Do not claim to calculate a real ATS score.\n- Make recommendations practical and specific.\n\nRESUME ANALYSIS:\n{{ JSON.stringify($json) }}\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2080,
+        16
+      ],
+      "id": "20acebbb-8c78-4ee6-987b-2b7d7f7cc1c1",
+      "name": "Improvement Advisor"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nYou are ResumeIQ, a professional resume rewriting assistant.\n\nINPUT:\nThe input contains:\n1. Original resume analysis from Chain 1.\n2. Resume improvement recommendations from Chain 2.\n\nYOUR TASK:\nCreate one improved, professional resume using the original resume analysis as the source of truth. Use the improvement report only to guide formatting and wording.\n\nSTRICT RULES:\n- Use only verified facts present in the original resume analysis.\n- Never invent names, contact details, skills, education, employers, dates, certifications, projects, achievements, or numerical metrics.\n- Do not turn recommendations into claims about the candidate.\n- Do not add suggested skills or projects unless they are already listed in the original analysis.\n- Do not assume a target job title, industry, or experience level.\n- Improve grammar, clarity, structure, and professional wording without changing factual meaning.\n- Use concise bullet points for projects and work experience where applicable.\n- Include only sections supported by the original analysis.\n- Omit missing or unspecified details rather than inventing placeholders.\n- Do not include private information that is absent from the source.\n- Return exactly ONE complete resume as plain text.\n- Do not include explanations, analysis, or commentary before or after the resume.\n\nMERGED INPUT:\n{{ JSON.stringify($json) }}\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2656,
+        -112
+      ],
+      "id": "b8db60bd-5098-4061-afb0-b25dc5208b9f",
+      "name": "Resume Rewriter"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are ResumeIQ's strict resume correction system.\n\nORIGINAL ANALYSIS:\n{{ JSON.stringify($('Resume Analyzer').item.json.output) }}\n\nRESUME TO CORRECT:\n{{ $('Resume Rewriter').item.json.text }}\n\nVERIFICATION FINDINGS:\n{{ JSON.stringify($('Verifier').item.json.output) }}\n\nInstructions:\n- The original analysis is the sole source of truth.\n- Remove every unsupported claim identified by the verification findings.\n- Specifically, remove Chart.js if unsupported.\n- Specifically, remove OpenSSL, AES-256, and Diffie-Hellman if unsupported.\n- Do not merely rename unsupported technologies or replace them with other invented details.\n- Keep all other claims only when supported by the original analysis.\n- Return the entire corrected resume as plain text, with no commentary.\n\nBefore responding, verify that the flagged unsupported claims have actually been removed.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        3584,
+        -368
+      ],
+      "id": "1449b621-7c46-4a68-9e88-41144f46b510",
+      "name": "Resume Corrector"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are ResumeIQ's final resume quality checker.\n\nRESUME TO CHECK:\n{{ $json.text }}\n\nORIGINAL RESUME ANALYSIS:\n{{ JSON.stringify($('Resume Analyzer').item.json.output) }}\n\nTASK:\nCheck the provided resume against the original resume analysis.\n\nCheck for:\n- Unsupported or invented skills, tools, projects, education, employers, dates, achievements, or numerical metrics.\n- Claims that contradict the original analysis.\n- Missing important facts that were present in the original analysis.\n- Clear formatting and professional readability.\n\nRULES:\n- The original resume analysis is the source of truth.\n- Do not assume a claim is true simply because it appears in the rewritten resume.\n- Set status to PASS only when the resume's factual claims are supported by the original analysis.\n- Otherwise, set status to REVIEW and list the specific issues.\n- Do not rewrite the resume.\n- Do not invent facts.\n\nReturn only the structured output requested by the output parser.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        4160,
+        -112
+      ],
+      "id": "b1f52939-a4cd-406a-9414-7daced79de21",
+      "name": "Final Verifier"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"status\": {\n      \"type\": \"string\",\n      \"enum\": [\"PASS\", \"REVIEW\"]\n    },\n    \"issues\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\"status\", \"issues\"],\n  \"additionalProperties\": false\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        4304,
+        112
+      ],
+      "id": "73b8d24e-ef0f-4032-bc73-ccbe8eb3393e",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        4176,
+        112
+      ],
+      "id": "a04fd1c5-c282-4407-8e81-f78a47129656",
+      "name": "Groq Chat Model5",
+      "credentials": {
+        "groqApi": {
+          "id": "MNTPUWGtWrLwNzvT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8fd8f699-a2e7-4541-835b-9d8683532371",
+              "name": "text",
+              "value": "={{ $('Resume Rewriter').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        3648,
+        32
+      ],
+      "id": "e6c3a0dc-274e-4a08-b025-1e497ee94fc7",
+      "name": "Keep Verified Resume"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6e6a3479-65fa-48ce-b05d-b1588ec2d7c8",
+              "leftValue": "={{ $json.output.status }}",
+              "rightValue": "REVIEW",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        4512,
+        -112
+      ],
+      "id": "6e2c8433-85b4-40f1-a71b-982f00556d09",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are ResumeIQ's final factual correction assistant.\n\nORIGINAL RESUME ANALYSIS:\n{{ JSON.stringify($('Resume Analyzer').item.json.output) }}\n\nRESUME TO CORRECT:\n{{ $('Keep Verified Resume').item.json.text }}\n\nFINAL VERIFICATION REPORT:\n{{ JSON.stringify($('Final Verifier').item.json.output) }}\n\nTASK:\nCorrect the resume so every factual claim is supported by the original resume analysis.\n\nRULES:\n- Remove or rewrite every unsupported claim identified in the verification report.\n- Specifically remove references to Render or cloud deployment if they are not supported by the original analysis.\n- Do not invent replacement details.\n- Preserve supported information and professional formatting.\n- Return the entire corrected resume as plain text only.\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        4736,
+        -240
+      ],
+      "id": "73defcc0-0ede-4ddb-b06e-7fe2edc41334",
+      "name": "Final Correction"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        4720,
+        48
+      ],
+      "id": "a252e91e-3203-4446-9fc0-db732e301b22",
+      "name": "Groq Chat Model6",
+      "credentials": {
+        "groqApi": {
+          "id": "MNTPUWGtWrLwNzvT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f891131-e0f7-468c-bfe8-3f2d60e536b7",
+              "name": "text",
+              "value": "={{ $('Resume Rewriter').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        5088,
+        16
+      ],
+      "id": "e28b7051-0018-49af-9f7a-6e24d2b1d486",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d616666-f83a-4bde-9ba8-eec8978deb28",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        5088,
+        -240
+      ],
+      "id": "dc56c0ad-8bda-4e2e-8dbc-9adf16bd544b",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d9c2ab2-d61a-4d08-b195-784a2db5cfe6",
+              "name": "Final_Resume",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        5536,
+        -112
+      ],
+      "id": "57f8f1b6-7975-4208-9821-1963de8c2d72",
+      "name": "ResumeIQ Final Output"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:8b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        96
+      ],
+      "id": "50e57114-3b16-47f2-91f7-4eb87fffd3f5",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "C1KaFRIqiwduFI6t",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        5696,
+        96
+      ],
+      "id": "35e97f3b-7bc8-4236-8134-ead9b65bc6fb",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "MNTPUWGtWrLwNzvT",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=create resume based on given data \n\ndata : {{ $json.Final_Resume }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        5760,
+        -112
+      ],
+      "id": "71e54155-712a-40ee-8de3-f0e6c8ecaaf0",
+      "name": "Resume"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Search files and folders').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1gjOdugoh8BdpHJ-qC8Tb5tHMr6tVLViz",
+          "mode": "list",
+          "cachedResultName": "Processed-R",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1gjOdugoh8BdpHJ-qC8Tb5tHMr6tVLViz"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6128,
+        -112
+      ],
+      "id": "947a7d7a-ffd3-4cd9-93cd-e80f700e9c57",
+      "name": "Move file2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I17cLKvpb4zei6B5",
+          "name": "KnowledgeForge"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ConvertAPI HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Move file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConvertAPI HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Move file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resume Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Resume Analyzer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Improvement Advisor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Improvement Advisor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Resume Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Resume Rewriter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Verifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Verifier",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Resume Corrector",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Keep Verified Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifier": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resume Corrector",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Improvement Advisor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Improvement Advisor": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Resume Rewriter": {
+      "main": [
+        [
+          {
+            "node": "Verifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Corrector": {
+      "main": [
+        [
+          {
+            "node": "Final Verifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Final Verifier",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Final Verifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Verified Resume": {
+      "main": [
+        [
+          {
+            "node": "Final Verifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Verifier": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Final Correction",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Final Correction",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Correction": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "ResumeIQ Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "ResumeIQ Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ResumeIQ Final Output": {
+      "main": [
+        [
+          {
+            "node": "Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resume Rewriter",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resume",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume": {
+      "main": [
+        [
+          {
+            "node": "Move file2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "de22ed94-08a7-4cb5-8418-1485efdfe6b4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "265623373d4440176b9b82cf96fcb8930a96864e202d72abd4bc2b6ab3513b7c"
+  },
+  "nodeGroups": [],
+  "id": "OozMLl14snh0EY9U",
+  "tags": []
+}
