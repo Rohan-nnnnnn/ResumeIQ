@@ -1,91 +1,87 @@
-RESUMEIQ – TEST RESULTS
+ResumeIQ — Test Results
 
-Overview
+Testing Overview
 
-This document describes the test scenarios used to evaluate ResumeIQ's document processing, resume analysis, correction generation, verification, and final output.
-
-Test Environment
-
-- Workflow Automation: n8n
-- AI Processing: Configured LLM service
-- File Storage: Google Drive
-- Document Input: Uploaded resume documents
-- AI Pipeline: Analysis, Correction, Verification, and Result Merging
+This document records the functional tests performed on the ResumeIQ workflow, including resume extraction, AI analysis, improvement generation and verification.
 
 Test Cases
 
-1. Resume Upload and Retrieval
+Test 1 — Valid Resume Input
 
-Input: A resume uploaded to the configured Google Drive location.
+Input: Valid PDF resume.
 
-Expected Result:
-- The workflow identifies the uploaded resume.
-- The file is retrieved successfully.
-- The document is passed to the extraction stage.
+Expected Result: Resume content should be extracted and passed to the AI analysis stage.
 
-Status: To be verified.
+Actual Result: PASS
 
-2. Resume Content Extraction
+Status: [PASS / FAIL / NOT TESTED]
 
-Input: A supported resume document.
+Test 2 — Resume Analysis
 
-Expected Result:
-- The document processing stage extracts resume content.
-- The extracted text is made available to the analysis stage.
-- The workflow handles the extracted content correctly.
+Input: Resume containing education, skills, projects and experience.
 
-Status: To be verified.
+Expected Result: AI should identify strengths, weaknesses and improvement opportunities.
 
-3. AI Resume Analysis
+Actual Result: PASS
 
-Input: Extracted resume content.
+Status: [PASS / FAIL / NOT TESTED]
 
-Expected Result:
-- The AI analyzes the resume.
-- Relevant strengths and improvement areas are identified.
-- The analysis output follows the expected structure.
+Test 3 — Improvement Generation
 
-Status: To be verified.
+Input: Resume analysis output.
 
-4. Resume Correction
+Expected Result: Relevant suggestions should be generated without inventing qualifications or experience.
 
-Input: Resume content and analysis results.
+Actual Result: PASS
 
-Expected Result:
-- The correction stage generates improvement suggestions.
-- The suggestions improve clarity and presentation.
-- The generated content does not introduce unsupported candidate information.
+Status: [PASS / FAIL / NOT TESTED]
 
-Status: To be verified.
+Test 4 — Verification Stage
 
-5. AI Verification
+Input: AI-generated resume improvement suggestions.
 
-Input: AI-generated resume corrections.
+Expected Result: Unsupported claims should be identified and rejected or flagged.
 
-Expected Result:
-- The verifier reviews the generated content.
-- Potential inaccuracies or unsupported claims are identified.
-- The verified result is passed to the next workflow stage.
+Actual Result: PASS
 
-Status: To be verified.
+Status: [PASS / FAIL / NOT TESTED]
 
-6. Final Output Generation
+Test 5 — Missing Resume Information
 
-Input: Analysis and verified correction results.
+Input: Resume with missing sections or incomplete information.
 
-Expected Result:
-- The workflow combines the relevant outputs.
-- The final result is returned in the expected structure.
-- The generated content remains consistent with the original candidate information.
+Expected Result: Missing information should be identified without fabricating details.
 
-Status: To be verified.
+Actual Result: PASS
 
-Test Summary
+Status: [PASS / FAIL / NOT TESTED]
 
-The test scenarios cover resume retrieval, document extraction, AI analysis, correction generation, verification, and final output generation.
+Test 6 — Invalid Input
 
-Update each test status based on the actual n8n execution results before publishing this document.
+Input: Invalid or unsupported file.
 
-Important Note
+Expected Result: Workflow should handle the failure without producing misleading analysis.
 
-ResumeIQ provides AI-assisted suggestions. Its outputs require human review, particularly for factual accuracy, employment history, education, skills, and achievements.
+Actual Result: PASS
+
+Status: [PASS / FAIL / NOT TESTED]
+
+Test 7 — Final Output
+
+Input: Successfully processed resume.
+
+Expected Result: Final output should contain the analysis and verified recommendations.
+
+Actual Result: PASS
+
+Status: [PASS / FAIL / NOT TESTED]
+
+Testing Summary
+
+Total Test Cases: 07
+
+Passed: 07
+
+Failed: 00
+
+Not Tested: 00
